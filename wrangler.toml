@@ -1,7 +1,4 @@
-# Cloudflare Workers Static Assets configuration.
+# Cloudflare Pages configuration.
 name = "bol-brand-website"
 compatibility_date = "2026-11-09"
-
-[assets]
-directory = "./dist"
-not_found_handling = "single-page-application"
+pages_build_output_dir = "./dist"

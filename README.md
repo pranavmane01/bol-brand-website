@@ -23,7 +23,7 @@ npm run build
 npm run preview
 ```
 
-Vite writes the production site to `dist/`. Cloudflare Pages publishes this directory and serves the SPA for direct visits to unknown paths.
+Vite writes the production site to `dist/`. The `pages_build_output_dir` setting in `wrangler.toml` tells Cloudflare Pages to publish this directory. Pages serves the SPA for direct visits to unknown paths.
 
 ## Deploy with GitHub and Cloudflare Pages
 
@@ -50,12 +50,12 @@ In the Pages project, open **Custom domains** and follow the instructions to att
 
 ## Deployment and performance notes
 
-- Cloudflare Pages automatically serves the SPA entry point for unknown paths, so direct visits and refreshes do not produce 404 errors.
+- Cloudflare Pages automatically serves the SPA entry point for unknown paths, so direct visits and refreshes do not produce 404 errors. `wrangler.toml` must keep `pages_build_output_dir = "./dist"` so Pages recognizes it as a Pages config.
 - Vite minifies and code-splits the production JavaScript and CSS. The Three.js hero scene is loaded after initial render and skipped on touch devices and when reduced motion is requested.
 - Static build assets are output to `dist/`; there is no image-processing or compression service to configure. The current hero image is only 13 KB and the page does not load it.
 - The contact form validates input and opens a prefilled email draft. The visitor must send it from their email app. Update the contact details in `src/data/siteData.js` before publishing.
 - The site has no required `.env` values. `.env.example` documents this; never put private credentials into `VITE_*` variables because Vite embeds those values in public frontend assets.
-- `wrangler.toml` remains for the existing optional Workers deployment. It is not needed by the Pages Git integration; Pages build settings are managed in the Cloudflare dashboard.
+- Cloudflare Pages Git integration runs the build and deploys the output automatically; do not set a separate `npx wrangler deploy` command for this Pages project.
 
 ## Scripts
 
