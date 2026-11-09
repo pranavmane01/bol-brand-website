@@ -1,5 +1,5 @@
 # Cloudflare Workers Static Assets configuration.
-name = "bolbrand"
+name = "bol-brand-website"
 compatibility_date = "2026-11-09"
 
 [assets]
