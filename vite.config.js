@@ -10,6 +10,20 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: false,          // no sourcemaps in production (reduces size)
     chunkSizeWarningLimit: 700,
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [
+            {
+              name: 'three-vendor',
+              test: /node_modules[\\/](?:three|three-stdlib|@react-three)[\\/]/,
+              maxSize: 350_000,
+              priority: 10,
+            },
+          ],
+        },
+      },
+    },
 
     // Compress assets aggressively
     assetsInlineLimit: 4096,  // inline files < 4 KB as base64
