@@ -1,6 +1,6 @@
 # BOL BRAND
 
-A React single-page site built with Vite. It deploys to Cloudflare Pages as a static site; no server, paid hosting, or environment variables are required.
+A React single-page site built with Vite. It deploys to Cloudflare as static assets; no paid hosting or application environment variables are required.
 
 ## Requirements
 
@@ -23,9 +23,9 @@ npm run build
 npm run preview
 ```
 
-Vite writes the production site to `dist/`. The Cloudflare Pages configuration in `wrangler.toml` points to this directory.
+Vite writes the production site to `dist/`. The Wrangler configuration points to this directory and enables SPA fallback for unknown paths.
 
-## Deploy with GitHub and Cloudflare Pages
+## Deploy with GitHub and Cloudflare Workers Builds
 
 ### 1. Push the project to GitHub
 
@@ -42,34 +42,35 @@ git push -u origin main
 
 Replace the repository URL with your own. Do not commit `.env` files, API keys, or credentials.
 
-### 2. Create the Cloudflare Pages project
+### 2. Connect the GitHub repository to Cloudflare
 
 1. Sign in to the [Cloudflare dashboard](https://dash.cloudflare.com/) and open **Workers & Pages**.
-2. Select **Create application** → **Pages** → **Connect to Git**.
+2. Select **Create application** → **Workers** → **Import a repository**.
 3. Authorize GitHub and select the repository you just pushed.
 4. Configure the build:
    - **Production branch:** `main`
-   - **Framework preset:** `Vite`
    - **Build command:** `npm run build`
-   - **Build output directory:** `dist`
+   - **Deploy command:** `npx wrangler deploy`
    - **Root directory:** `/`
-5. In **Environment variables**, add `NODE_VERSION` = `22` if the build environment does not pick it up from `.node-version`. No application environment variables are currently needed.
+5. Add `NODE_VERSION` = `22` if the build environment does not pick it up from `.node-version`. No application environment variables are required.
 6. Select **Save and Deploy**.
 
-Cloudflare builds and publishes the contents of `dist/`. The site will be available at a free `*.pages.dev` address. Later pushes to `main` trigger production deployments; other branches can be used for preview deployments.
+Wrangler reads `wrangler.toml` and deploys `dist/` as static assets, with SPA fallback enabled. The site will be available at a free `*.workers.dev` address. Later pushes to `main` trigger deployments.
+
+> **Important:** This repository is configured for Workers Builds, whose deploy command is `npx wrangler deploy`. Do not use the Pages deploy command for this setup. If you choose Cloudflare Pages instead, create a Pages project with build command `npm run build` and output directory `dist`; Pages performs the deploy itself, so no `npx wrangler deploy` command should be configured.
 
 ### 3. Optional custom domain
 
-In the Pages project, open **Custom domains** and follow the instructions to attach a domain you already own. Cloudflare Pages hosting is free on the Free plan; purchasing a domain or using paid account features may cost extra.
+In your Cloudflare project, open **Custom domains** and follow the instructions to attach a domain you already own. Cloudflare static hosting is available on the Free plan; purchasing a domain or using paid account features may cost extra.
 
 ## Deployment and performance notes
 
-- `public/_redirects` sends unknown paths to `index.html`, so the SPA still loads on a direct visit or refresh.
+- Wrangler's `not_found_handling = "single-page-application"` setting serves `index.html` for unknown paths, so the SPA still loads on a direct visit or refresh.
 - Vite minifies and code-splits the production JavaScript and CSS. The Three.js hero scene is loaded after initial render and skipped on touch devices and when reduced motion is requested.
 - Static build assets are output to `dist/`; there is no image-processing or compression service to configure. The current hero image is only 13 KB and the page does not load it.
 - The contact form validates input and opens a prefilled email draft. The visitor must send it from their email app. Update the contact details in `src/data/siteData.js` before publishing.
 - The site has no required `.env` values. `.env.example` documents this; never put private credentials into `VITE_*` variables because Vite embeds those values in public frontend assets.
-- `wrangler.toml` configures the Pages project name and output directory. In the Git integration flow above, the build command is configured in the Cloudflare dashboard.
+- `wrangler.toml` configures the Worker name, static output directory, and SPA fallback. The build and deploy commands are configured in the Cloudflare dashboard.
 
 ## Scripts
 
